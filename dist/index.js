@@ -1,68 +1,58 @@
 "use strict";
-var Escolhas;
-(function (Escolhas) {
-    Escolhas["pedra"] = "pedra";
-    Escolhas["papel"] = "papel";
-    Escolhas["tesoura"] = "tesoura";
-})(Escolhas || (Escolhas = {}));
-const buttons = document.querySelectorAll('button');
-const h1 = document.getElementById("H1");
-const machineChoose = document.getElementById("machine");
-const playerChoose = document.getElementById("player");
+var Escolha;
+(function (Escolha) {
+    Escolha["Pedra"] = "pedra";
+    Escolha["Papel"] = "papel";
+    Escolha["Tesoura"] = "tesoura";
+})(Escolha || (Escolha = {}));
+var elementos = {
+    resultado: document.getElementById('resultado'),
+    escolhaMaquina: document.getElementById('escolhaMaquina'),
+    escolhaJogador: document.getElementById('escolhaJogador'),
+    placarJogador: document.getElementById('playerScore'),
+    placarAdversário: document.getElementById('computerScore'),
+};
+var placar = {
+    jogador: 0,
+    adversário: 0,
+};
 function escolhaAleatoria() {
-    const escolhas = Object.values(Escolhas);
-    const escolhaAleatoria = Math.floor(Math.random() * escolhas.length);
-    console.log(escolhas[escolhaAleatoria]);
-    img(escolhas[escolhaAleatoria], machineChoose);
-    return escolhas[escolhaAleatoria];
+    var escolhas = [Escolha.Pedra, Escolha.Papel, Escolha.Tesoura];
+    return escolhas[Math.floor(Math.random() * escolhas.length)];
 }
-function strForEnum(value) {
-    if (Object.values(Escolhas).includes(value)) {
-        return value;
-    }
-    return undefined;
-}
-function teste(valueFromHtml) {
-    const newValue = strForEnum(valueFromHtml);
-    const escolhaMaquina = escolhaAleatoria();
-    let vencedor = "";
-    if (newValue === Escolhas.papel && escolhaMaquina === Escolhas.pedra || newValue === Escolhas.pedra && escolhaMaquina === Escolhas.tesoura || newValue === Escolhas.tesoura && escolhaMaquina === Escolhas.papel) {
-        vencedor = "Você ganhou";
-    }
-    else if (newValue === escolhaMaquina) {
-        vencedor = "Empatou";
+function determinarVencedor(escolhaJogador, escolhaMaquina) {
+    var _a;
+    if (escolhaJogador === escolhaMaquina)
+        return 'Empate!';
+    var vitoriasJogador = (_a = {},
+        _a[Escolha.Papel] = Escolha.Pedra,
+        _a[Escolha.Pedra] = Escolha.Tesoura,
+        _a[Escolha.Tesoura] = Escolha.Papel,
+        _a);
+    if (vitoriasJogador[escolhaJogador] === escolhaMaquina) {
+        placar.jogador++;
+        return 'Você ganhou!';
     }
     else {
-        vencedor = "Perdeu";
-    }
-    return vencedor;
-}
-function img(chooseImg, whoIs) {
-    const escolha = strForEnum(chooseImg);
-    if (escolha === Escolhas.pedra) {
-        if (whoIs) {
-            whoIs.src = "./assets/pedra.png";
-        }
-    }
-    else if (escolha === Escolhas.papel) {
-        if (whoIs) {
-            whoIs.src = "./assets/papel.webp";
-        }
-    }
-    else if (escolha === Escolhas.tesoura) {
-        if (whoIs) {
-            whoIs.src = "./assets/tesoura.webp";
-        }
+        placar.adversário++;
+        return 'Adversário ganhou!';
     }
 }
-buttons.forEach(button => {
-    button.addEventListener('click', (event) => {
-        const target = event.target;
-        const winner = teste(target.value);
-        img(target.value, playerChoose);
-        if (h1) {
-            h1.textContent = winner;
-        }
-        console.log(winner);
+function atualizarPlacar() {
+    elementos.placarJogador.textContent = placar.jogador.toString();
+    elementos.placarAdversário.textContent = placar.adversário.toString();
+}
+function jogar(escolhaJogador) {
+    var escolhaMaquina = escolhaAleatoria();
+    elementos.escolhaJogador.textContent = escolhaJogador;
+    elementos.escolhaMaquina.textContent = escolhaMaquina;
+    var resultado = determinarVencedor(escolhaJogador, escolhaMaquina);
+    elementos.resultado.textContent = resultado;
+    atualizarPlacar();
+}
+document.querySelectorAll('button[data-escolha]').forEach(function (botao) {
+    botao.addEventListener('click', function () {
+        var escolha = botao.dataset.escolha;
+        jogar(escolha);
     });
 });
